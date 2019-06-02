@@ -170,7 +170,7 @@ func init() {
 	})
 
 	// Alpha check if provided field contains valid letters
-	AddCustomRule("alpha", func(field string, vlaue string, message string, value interface{}) error {
+	AddCustomRule("alpha", func(field string, rule string, message string, value interface{}) error {
 		str := toString(value)
 		err := fmt.Errorf("The %s may only contain letters", field)
 		if message != "" {
@@ -183,7 +183,7 @@ func init() {
 	})
 
 	// AlphaDash check if provided field contains valid letters, numbers, underscore and dash
-	AddCustomRule("alpha_dash", func(field string, vlaue string, message string, value interface{}) error {
+	AddCustomRule("alpha_dash", func(field string, rule string, message string, value interface{}) error {
 		str := toString(value)
 		err := fmt.Errorf("The %s may only contain letters, numbers, and dashes", field)
 		if message != "" {
@@ -196,7 +196,7 @@ func init() {
 	})
 
 	// AlphaDash check if provided field contains valid letters, numbers, underscore and dash
-	AddCustomRule("alpha_space", func(field string, vlaue string, message string, value interface{}) error {
+	AddCustomRule("alpha_space", func(field string, rule string, message string, value interface{}) error {
 		str := toString(value)
 		err := fmt.Errorf("The %s may only contain letters, numbers, dashes, space", field)
 		if message != "" {
@@ -209,7 +209,7 @@ func init() {
 	})
 
 	// AlphaNumeric check if provided field contains valid letters and numbers
-	AddCustomRule("alpha_num", func(field string, vlaue string, message string, value interface{}) error {
+	AddCustomRule("alpha_num", func(field string, rule string, message string, value interface{}) error {
 		str := toString(value)
 		err := fmt.Errorf("The %s may only contain letters and numbers", field)
 		if message != "" {
@@ -223,7 +223,7 @@ func init() {
 
 	// Boolean check if provided field contains Boolean
 	// in this case: "0", "1", 0, 1, "true", "false", true, false etc
-	AddCustomRule("bool", func(field string, vlaue string, message string, value interface{}) error {
+	AddCustomRule("bool", func(field string, rule string, message string, value interface{}) error {
 		err := fmt.Errorf("The %s may only contain boolean value, string or int 0, 1", field)
 		if message != "" {
 			err = errors.New(message)
@@ -1058,6 +1058,14 @@ func init() {
 		}
 		if isIn(rng, str) {
 			return err
+		}
+		return nil
+	})
+
+	// check if provided field is a map
+	AddCustomRule("map", func(field string, rule string, message string, value interface{}) error {
+		if _, ok := value.(map[string]interface{}); !ok {
+			return fmt.Errorf("The %s field must be a map[string]interface{}", field)
 		}
 		return nil
 	})
