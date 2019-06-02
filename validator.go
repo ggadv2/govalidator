@@ -226,15 +226,6 @@ func (v *Validator) ValidateMap() url.Values {
 func (v *Validator) internalValidateMap() url.Values {
 	errsBag := url.Values{}
 
-	if v.Opts.Request != nil {
-		defer v.Opts.Request.Body.Close()
-		err := json.NewDecoder(v.Opts.Request.Body).Decode(v.Opts.Data)
-		if err != nil {
-			errsBag.Add("_error", err.Error())
-			return errsBag
-		}
-	}
-
 	mapValue := v.Opts.Data.(map[string]interface{})
 
 	//clean if the key is not exist or value is empty or zero value
