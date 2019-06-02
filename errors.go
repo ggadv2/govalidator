@@ -10,5 +10,6 @@ var (
 	errInvalidArgument      = errors.New("govalidator: invalid number of argument")
 	errRequirePtr           = errors.New("govalidator: provide pointer to the data structure")
 	errRequireData          = errors.New("govalidator: provide non-nil data structure for ValidateStruct method")
+	errRequireMap           = errors.New("govalidator: provide non-nil map for ValidateMap method")
 	errRequestNotAccepted   = errors.New("govalidator: cannot provide an *http.Request for ValidateStruct method")
 )

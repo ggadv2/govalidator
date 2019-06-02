@@ -207,6 +207,56 @@ func (v *Validator) internalValidateStruct() url.Values {
 	return errsBag
 }
 
+func (v *Validator) ValidateMap() url.Values {
+	if len(v.Opts.Rules) == 0 {
+		panic(errRequireRules)
+	}
+	if v.Opts.Request != nil {
+		panic(errRequestNotAccepted)
+	}
+	if v.Opts.Data != nil && reflect.TypeOf(v.Opts.Data).Kind() != reflect.Map {
+		panic(errRequireMap)
+	}
+	if v.Opts.Data == nil {
+		panic(errRequireData)
+	}
+
+	return v.internalValidateMap()
+}
+func (v *Validator) internalValidateMap() url.Values {
+	errsBag := url.Values{}
+
+	if v.Opts.Request != nil {
+		defer v.Opts.Request.Body.Close()
+		err := json.NewDecoder(v.Opts.Request.Body).Decode(v.Opts.Data)
+		if err != nil {
+			errsBag.Add("_error", err.Error())
+			return errsBag
+		}
+	}
+
+	mapValue := v.Opts.Data.(map[string]interface{})
+
+	//clean if the key is not exist or value is empty or zero value
+	nr := v.getNonRequiredJSONFields(mapValue)
+
+	for field, rules := range v.Opts.Rules {
+		if _, ok := nr[field]; ok {
+			continue
+		}
+		value := mapValue[field]
+		for _, rule := range rules {
+			if !isRuleExist(rule) {
+				panic(fmt.Errorf("govalidator: %s is not a valid rule", rule))
+			}
+			msg := v.getCustomMessage(field, rule)
+			validateCustomRules(field, rule, msg, value, errsBag)
+		}
+	}
+
+	return errsBag
+}
+
 // getNonRequiredJSONFields get non required rules fields from rules if requiredDefault field is false
 // and if the input data is empty for this field
 func (v *Validator) getNonRequiredJSONFields(inputs map[string]interface{}) map[string]struct{} {
